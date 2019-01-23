@@ -57,12 +57,13 @@ class GatewayAPIProviderTest(unittest.TestCase):
 
         self.assertEqual(om.msgid, '123')
 
-        # Test 3: errors (from the docs)
+        # Test 3: error (from the docs)
         self.assertRaises(error.ApiError, self._test_send_request,
                           OutgoingMessage('+1999', 'Test'), None,
                           403, {"code": "0x0213", "incident_uuid": "d8127429-fa0c-4316-b1f2-e610c3958f43",
                                 "message": "Unauthorized IP-address: %1", "variables": ["1.2.3.4"]}
                           )
+        # Test 4: Insufficient funds
         self.assertRaises(error.InsufficientFundsError, self._test_send_request,
                           OutgoingMessage('+1999', 'Test'), None,
                           403, {"code": "0x0216", "incident_uuid": "d8127429-fa0c-4316-b1f2-e610c3958f43",

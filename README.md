@@ -35,7 +35,7 @@ from smsframework_gatewayapi import GatewayAPIProvider
 
 gateway = Gateway()
 gateway.add_provider('gapi', GatewayAPIProvider,
-    ....
+    key='AAABBBBCCCCDDDD', secret='XAD*HHH(aaaaa'
 )
 ```
 
@@ -52,13 +52,6 @@ Example
 
 ```python
 from smsframework import Gateway, OutgoingMessage
-from smsframework_gatewayapi import GatewayAPIProvider
-
-# Init Gateway, Provider
-gateway = Gateway()
-gateway.add_provider('gapi', GatewayAPIProvider,
-    key='AAABBBBCCCCDDDD', secret='XAD*HHH(aaaaa'
-)
 
 # Send a regular message
 gateway.send(OutgoingMessage('+19991112233', 'Test'))
