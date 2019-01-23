@@ -4,3 +4,4 @@ exdoc
 j2cli
 flask
 smsframework
+requests-mock

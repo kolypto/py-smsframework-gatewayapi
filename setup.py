@@ -23,6 +23,7 @@ setup(
 
     install_requires=[
         'smsframework >= 0.0.9',
+        'requests_oauthlib >= 1.2.0',
     ],
     extras_require={
         'receiver': ['flask >= 0.10'],  # sms receiving

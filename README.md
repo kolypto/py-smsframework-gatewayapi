@@ -44,29 +44,44 @@ Config
 
 Source: /smsframework_gatewayapi/provider.py
 
-* ``: ...
+* `key`: API key
+* `secret`: API secret
 
 Example
 =======
+
+```python
+from smsframework import Gateway, OutgoingMessage
+from smsframework_gatewayapi import GatewayAPIProvider
+
+# Init Gateway, Provider
+gateway = Gateway()
+gateway.add_provider('gapi', GatewayAPIProvider,
+    key='AAABBBBCCCCDDDD', secret='XAD*HHH(aaaaa'
+)
+
+# Send a regular message
+gateway.send(OutgoingMessage('+19991112233', 'Test'))
+
+# Send a premium message
+gateway.send(OutgoingMessage('+19991112233', 'Test').options(escalate=True))
+```
 
 
 
 Supported Options
 =================
 
-* ``: ...
+* `validity_period`: Message expiration time in minutes
+* `senderId`: Alpha-numeric SenderId
+* `escalate`: Premium message
 
 
 
 Provider-Specific Parameters
 ============================
 
-* ``: ...
-
-
-Example:
-
-
+See <https://gatewayapi.com/docs/rest.html#post--rest-mtsms>
 
 Limitations
 ===========
