@@ -32,7 +32,7 @@ class GatewayAPIProvider(IProvider):
 
         #if message.src:
         #if message.provider_options.allow_reply:
-        #if message.provider_options.status_report:  # TODO: specify status report URL in the request: 'callback_url'
+        #if message.provider_options.status_report:
         if message.provider_options.expires:
             params['validity_period'] = message.provider_options.expires*60
         if message.provider_options.senderId:
@@ -60,7 +60,6 @@ class GatewayAPIProvider(IProvider):
 
     def make_receiver_blueprint(self):
         """ Create the receiver blueprint """
-        raise NotImplementedError()
         from . import receiver
         return receiver.bp
 

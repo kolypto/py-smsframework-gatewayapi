@@ -76,7 +76,17 @@ Provider-Specific Parameters
 
 See <https://gatewayapi.com/docs/rest.html#post--rest-mtsms>
 
-Limitations
-===========
 
-Incoming messages are currently not supported.
+
+Receivers
+=========
+
+Source: /smsframework_gatewayapi/receiver.py
+
+Message Receiver: /im
+---------------------
+Message Receiver URL: `<provider-name>/im`
+
+Status Receiver: /status
+------------------------
+Status Receiver URL: `<provider-name>/status`
