@@ -16,7 +16,7 @@ Install from pypi:
     $ pip install smsframework_gatewayapi
 
 To receive SMS messages, you need to ensure that
-[Flask microframework](http://flask.pocoo.org) is also installed:
+[Flask microframework](http://flask.pocoo.org) is also installed, as well as the JWT library:
 
 
     $ pip install smsframework_gatewayapi[receiver]
@@ -46,6 +46,7 @@ Source: /smsframework_gatewayapi/provider.py
 
 * `key`: API key
 * `secret`: API secret
+* `jwt_secret`: Secret token for the JWT header (only for REST webhook that receives messages)
 
 Example
 =======
@@ -83,10 +84,13 @@ Receivers
 
 Source: /smsframework_gatewayapi/receiver.py
 
-Message Receiver: /im
----------------------
-Message Receiver URL: `<provider-name>/im`
+GatewayApi uses a single webhook URL to receive both messages and status reports.
 
-Status Receiver: /status
-------------------------
-Status Receiver URL: `<provider-name>/status`
+Webhook URL: `<provider-name>/callback`
+
+In order to configure it, go to the [API/Webhooks](https://gatewayapi.com/app/settings/web-hooks/) section in the 
+control panel, and add a new "REST" webhook.
+The URL will be something like this: `http://.../<prefix>/<provider-name>/callback`
+
+In the *Authentication* section, you can specify a JWT secret token. Pass it to the `GatewayAPIProvider` 
+in order to have secure message reception.

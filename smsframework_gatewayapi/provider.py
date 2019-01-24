@@ -8,14 +8,16 @@ from . import error
 class GatewayAPIProvider(IProvider):
     """ GatewayApi Provider """
 
-    def __init__(self, gateway, name, key, secret):
+    def __init__(self, gateway, name, key, secret, jwt_secret=None):
         """ Configure GatewayApi provider
 
             :param key: API key
             :param secret: API secret
+            :param jwt_secret: JWT secret token
         """
         self._key = key
         self._secret = secret
+        self._jwt_secret = jwt_secret
         super(GatewayAPIProvider, self).__init__(gateway, name)
 
     def send(self, message):
@@ -27,7 +29,7 @@ class GatewayAPIProvider(IProvider):
         # Parameters
         params = {
             'message': message.body,
-            'recipients': [{'msisdn': message.dst}],
+            'recipients': [{'msisdn': int(message.dst)}],
         }
 
         #if message.src:

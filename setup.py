@@ -26,7 +26,7 @@ setup(
         'requests_oauthlib >= 1.2.0',
     ],
     extras_require={
-        'receiver': ['flask >= 0.10'],  # sms receiving
+        'receiver': ['flask >= 0.10', 'pyjwt >= 1.7.1'],  # sms receiving
     },
     test_suite='nose.collector',
     include_package_data=True,

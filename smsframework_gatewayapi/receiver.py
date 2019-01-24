@@ -1,7 +1,7 @@
-import sys
+import jwt
 from datetime import datetime
-from flask import Blueprint
-from flask.globals import request, g
+from flask import Blueprint, Response
+from flask.globals import request, g, current_app
 
 from smsframework.data import IncomingMessage
 from smsframework_gatewayapi.status import GatewayApiMessageStatus
@@ -9,26 +9,38 @@ from smsframework_gatewayapi.status import GatewayApiMessageStatus
 bp = Blueprint('smsframework-gatewayapi', __name__, url_prefix='/')
 
 
-@bp.route('/im', methods=('POST',))
-def im():
+@bp.route('/callback', methods=('POST',))
+def callback():
+    """ Combined Message / Status handler """
+    # Security: JWT header
+    if g.provider._jwt_secret is not None:
+        try:
+            jwt.decode(request.headers.get('X-GWAPI-Signature', ''), g.provider._jwt_secret, algorithms=['HS256'])
+        except jwt.DecodeError as e:
+            return Response('Insecure: JWT header error. Wrong JWT secret token in config?', status=403)
+    # Handle
+    req = request.get_json()
+    if 'message' in req:
+        return im(req)
+    else:
+        return status(req)
+
+
+def im(req):
     """ Incoming message handler
 
     Docs: https://gatewayapi.com/docs/rest.html#mo-sms-receiving-sms-es
     """
-    req = request.get_json()
-
     # Check
     for n in ('id', 'msisdn', 'message', 'senttime'):
         assert n in req, 'Received a message with missing "{}" field: {}'.format(n, req)
 
     # Message text
     body = req.pop('message')
+
+    # Encoding
     if 'encoding' in req:
         pass  # TODO: implement encoding
-        # if sys.version_info[0] == 2:
-        #     req['text'] = req['text'].decode(req['encoding'])  # Python 2: str -> unicode
-        # else:
-        #     req['text'] = bytes(req['text'], 'latin-1').decode(req['encoding'])  # Python 3: str -> bytes -> unicode
 
     # IncomingMessage
     message = IncomingMessage(
@@ -36,7 +48,7 @@ def im():
         body=body,
         msgid=str(req.pop('id')),
         dst=str(req.pop('receiver')),
-        rtime=datetime.utcfromtimestamp(req.pop('senttime')),  # TODO: What timezone?
+        rtime=datetime.utcfromtimestamp(req.pop('senttime')),  # Time's in UTC
         meta=req
     )
 
@@ -45,17 +57,14 @@ def im():
     g.provider._receive_message(message)  # exception results in code 500 ; they will retry
 
     # Ack
-    return '<ack refno="{msgid}" errorcode="0" />'.format(msgid=message.msgid)
+    return 'got it!'
 
 
-@bp.route('/status', methods=('POST',))
-def status():
+def status(req):
     """ Incoming status report
 
     Docs: https://gatewayapi.com/docs/rest.html#delivery-status-notification
     """
-    req = request.get_json()
-
     # Check fields
     for n in ('status', 'id', 'time'):
         assert n in req, 'Received a status with missing "{}" field: {}'.format(n, req)
@@ -64,7 +73,7 @@ def status():
     status = GatewayApiMessageStatus.from_code(
         req.pop('status').title(),  # comes in in all caps
         msgid=str(req.pop('id')),  # (integer)
-        rtime=datetime.utcfromtimestamp(req.pop('time')),  # TODO: What timezone?
+        rtime=datetime.utcfromtimestamp(req.pop('time')),  # Time's in UTC
         meta=req
     )
 
@@ -72,4 +81,4 @@ def status():
     g.provider._receive_status(status)  # exception results in code 500 ; they will retry
 
     # Ack with anything
-    return 'okay-okay! :)'
+    return 'okay, thanks!'
